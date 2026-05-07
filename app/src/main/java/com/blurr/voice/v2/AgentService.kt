@@ -21,6 +21,7 @@ import com.blurr.voice.v2.fs.FileSystem
 import com.blurr.voice.v2.llm.GeminiApi as LLMGeminiApi
 import com.blurr.voice.v2.message_manager.MemoryManager
 import com.blurr.voice.v2.perception.Perception
+import com.blurr.voice.v2.perception.SemanticParser
 import kotlinx.coroutines.*
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -38,6 +39,8 @@ class AgentService : Service() {
     private lateinit var llmApi: LLMGeminiApi
     private lateinit var actionExecutor: ActionExecutor
     private lateinit var overlayManager: OverlayManager
+    private lateinit var eyes: Eyes
+    private lateinit var finger: Finger
 
     companion object {
         private const val NOTIFICATION_CHANNEL_ID = "AgentServiceChannelV2"
@@ -75,9 +78,10 @@ class AgentService : Service() {
         createNotificationChannel()
         isRunning = true
 
+        eyes = Eyes(this)
+        finger = Finger(this)
         settings = AgentSettings()
         fileSystem = FileSystem(this)
-        val eyes = Eyes(this)
         val semanticParser = SemanticParser()
         perception = Perception(eyes, semanticParser)
         llmApi = LLMGeminiApi("gemini-2.0-flash", ApiKeyManager, this)
