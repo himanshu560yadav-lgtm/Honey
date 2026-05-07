@@ -85,7 +85,7 @@ class AgentService : Service() {
         val semanticParser = SemanticParser()
         perception = Perception(eyes, semanticParser)
         llmApi = LLMGeminiApi("gemini-2.0-flash", ApiKeyManager, this)
-        actionExecutor = ActionExecutor(this)
+        actionExecutor = ActionExecutor(finger)
         overlayManager = OverlayManager.getInstance(this)
         val memoryManager = MemoryManager(this)
 
