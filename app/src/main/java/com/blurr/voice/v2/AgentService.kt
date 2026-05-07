@@ -77,7 +77,9 @@ class AgentService : Service() {
 
         settings = AgentSettings()
         fileSystem = FileSystem(this)
-        perception = Perception(this)
+        val eyes = Eyes(this)
+        val semanticParser = SemanticParser()
+        perception = Perception(eyes, semanticParser)
         llmApi = LLMGeminiApi("gemini-2.0-flash", ApiKeyManager, this)
         actionExecutor = ActionExecutor(this)
         overlayManager = OverlayManager.getInstance(this)
