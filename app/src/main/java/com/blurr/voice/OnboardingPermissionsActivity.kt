@@ -29,7 +29,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import com.blurr.voice.utilities.OnboardingManager
 import android.widget.VideoView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -216,15 +215,10 @@ class OnboardingPermissionsActivity : AppCompatActivity() {
                     titleRes = R.string.default_assistant_role_title,
                     descRes = R.string.default_assistant_role_desc,
                     iconRes = R.drawable.butler,
-                    isGranted = {
-                        val rm = getSystemService(RoleManager::class.java)
-                        rm?.isRoleHeld(RoleManager.ROLE_ASSISTANT) == true
-                    },
+                    isGranted = { false },
                     action = {
-                        startActivity(Intent(this, RoleRequestActivity::class.java))
-                    },
-                    videoUrl = "https://storage.googleapis.com/blurr-app-assets/default_assitant.mp4",
-                    videoFileName = "default_assitant.mp4"
+                        Toast.makeText(this, "Default assistant disabled in this version", Toast.LENGTH_SHORT).show()
+                    }
                 )
             )
         }

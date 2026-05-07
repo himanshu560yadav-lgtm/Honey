@@ -148,40 +148,14 @@ class SettingsActivity : BaseNavigationActivity() {
             showBatteryOptimizationDialog()
         }
         wakeWordButton.setOnClickListener {
-            val keyManager = PicovoiceKeyManager(this)
-            
-            // Step 1: Save key if provided in the EditText
-            val userKey = editWakeWordKey.text.toString().trim()
-            if (userKey.isNotEmpty()) {
-                keyManager.saveUserProvidedKey(userKey)
-                Toast.makeText(this, "Wake word key saved.", Toast.LENGTH_SHORT).show()
-            }
-            
-            // Step 2: Check if we have a key (either just saved or previously saved)
-            val hasKey = !keyManager.getUserProvidedKey().isNullOrBlank()
-            
-            if (!hasKey) {
-                showPicovoiceKeyRequiredDialog()
-                return@setOnClickListener
-            }
-            
-            // Step 3: Enable the wake word
-            wakeWordManager.handleWakeWordButtonClick(wakeWordButton)
-            // Give the service a moment to update its state before refreshing the UI
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ updateWakeWordButtonState() }, 500)
+            Toast.makeText(this, "Wake word is disabled in this version", Toast.LENGTH_SHORT).show()
         }
         textGetPicovoiceKeyLink.setOnClickListener {
-            val url = "https://console.picovoice.ai/login"
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(url)
-            try {
-                startActivity(intent)
-            } catch (e: Exception) {
-                // This might happen if the device has no web browser
-                Toast.makeText(this, "Could not open link. No browser found.", Toast.LENGTH_SHORT).show()
-                Log.e("SettingsActivity", "Failed to open Picovoice link", e)
-            }
+            Toast.makeText(this, "Wake word is disabled in this version", Toast.LENGTH_SHORT).show()
         }
+        wakeWordButton.isEnabled = false
+        editWakeWordKey.isEnabled = false
+        textGetPicovoiceKeyLink.isEnabled = false
 
 
         buttonSignOut.setOnClickListener {
@@ -374,8 +348,8 @@ class SettingsActivity : BaseNavigationActivity() {
         getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().clear().apply()
 
 
-        // Restart the app by navigating to the onboarding screen
-        val intent = Intent(this, LoginActivity::class.java)
+        // Restart the app by navigating to the home screen
+        val intent = Intent(this, HomeActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
