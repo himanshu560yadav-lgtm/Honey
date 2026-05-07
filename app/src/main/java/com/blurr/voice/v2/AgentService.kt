@@ -87,7 +87,12 @@ class AgentService : Service() {
         llmApi = LLMGeminiApi("gemini-2.0-flash", ApiKeyManager, this)
         actionExecutor = ActionExecutor(finger)
         overlayManager = OverlayManager.getInstance(this)
-        val memoryManager = MemoryManager(this)
+        val memoryManager = MemoryManager(
+            context = this,
+            task = "",
+            fileSystem = fileSystem,
+            settings = settings
+        )
 
         agent = Agent(
             settings = settings,
