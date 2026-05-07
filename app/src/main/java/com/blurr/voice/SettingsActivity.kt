@@ -45,7 +45,6 @@ class SettingsActivity : BaseNavigationActivity() {
     private lateinit var wakeWordButton: TextView
     private lateinit var buttonSignOut: Button
     private lateinit var wakeWordManager: WakeWordManager
-    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
 
     private lateinit var sc: SpeechCoordinator
@@ -69,9 +68,6 @@ class SettingsActivity : BaseNavigationActivity() {
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show()
-                // The manager will handle the service start after permission is granted.
-                wakeWordManager.handleWakeWordButtonClick(wakeWordButton)
-                updateWakeWordButtonState()
             } else {
                 Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show()
             }
@@ -96,7 +92,7 @@ class SettingsActivity : BaseNavigationActivity() {
         sc = SpeechCoordinator.getInstance(this)
         availableVoices = GoogleTts.getAvailableVoices()
         // Initialize wake word manager
-        wakeWordManager = WakeWordManager(this, requestPermissionLauncher)
+        wakeWordManager = WakeWordManager(this)
     }
 
     private fun setupUI() {
@@ -246,15 +242,11 @@ class SettingsActivity : BaseNavigationActivity() {
 
     private fun loadAllSettings() {
 
-        // Inside loadAllSettings()
-        val keyManager = PicovoiceKeyManager(this)
-        editWakeWordKey.setText(keyManager.getUserProvidedKey() ?: "") // You will create this method next
+        editWakeWordKey.setText("")
+        
         val savedVoiceName = sharedPreferences.getString(KEY_SELECTED_VOICE, DEFAULT_VOICE.name)
         val savedVoice = availableVoices.find { it.name == savedVoiceName } ?: DEFAULT_VOICE
         ttsVoicePicker.value = availableVoices.indexOf(savedVoice)
-        
-        // Update wake word button state
-        updateWakeWordButtonState()
 
         switchShowThoughts.isChecked = sharedPreferences.getBoolean(KEY_SHOW_THOUGHTS, false)
     }

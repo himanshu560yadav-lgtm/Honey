@@ -194,5 +194,5 @@ class TriggersActivity : BaseNavigationActivity() {
     
     override fun getContentLayoutId(): Int = R.layout.activity_triggers
     
-    override fun getCurrentNavItem(): BaseNavigationActivity.NavItem = BaseNavigationActivity.NavItem.TRIGGERS
+    override fun getCurrentNavItem(): BaseNavigationActivity.NavItem = BaseNavigationActivity.NavItem.HOME
 }

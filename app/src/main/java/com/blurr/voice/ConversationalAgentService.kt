@@ -67,7 +67,6 @@ class ConversationalAgentService : Service() {
     private val maxClarificationAttempts = 1
     private var sttErrorAttempts = 0
     private val maxSttErrorAttempts = 2
-    private val clarificationAgent = ClarificationAgent()
     private val pandaStateManager by lazy { PandaStateManager.getInstance(this) }
     private val servicePermissionManager by lazy { ServicePermissionManager(this) }
 

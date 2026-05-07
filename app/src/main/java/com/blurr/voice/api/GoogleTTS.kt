@@ -53,9 +53,12 @@ enum class TTSVoice(val displayName: String, val voiceName: String, val descript
  * Handles communication with the Google Cloud Text-to-Speech API.
  */
 object GoogleTts {
-    const val apiKey = BuildConfig.GOOGLE_TTS_API_KEY
+    private val apiKey: String = "" // Google TTS disabled
     private val client = OkHttpClient()
-    private const val API_URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=$apiKey"
+
+    fun isEnabled(): Boolean = false
+
+    private const val API_URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize"
 
     /**
      * Synthesizes speech from text using the Google Cloud TTS API with default voice.

@@ -78,21 +78,20 @@ class AgentService : Service() {
         settings = AgentSettings()
         fileSystem = FileSystem(this)
         perception = Perception(this)
-        llmApi = GeminiApi
+        val apiKeyManager = com.blurr.voice.utilities.ApiKeyManager
+        llmApi = com.blurr.voice.v2.llm.GeminiApi("gemini-2.0-flash", apiKeyManager, this)
         actionExecutor = ActionExecutor(this)
         overlayManager = OverlayManager.getInstance(this)
+        val memoryManager = com.blurr.voice.v2.message_manager.MemoryManager(this)
 
-        val eyes = Eyes(this)
-        val finger = Finger(this)
         agent = Agent(
             settings = settings,
-            llmApi = llmApi,
+            memoryManager = memoryManager,
             perception = perception,
+            llmApi = llmApi,
             actionExecutor = actionExecutor,
-            eyes = eyes,
-            finger = finger,
             fileSystem = fileSystem,
-            overlayDispatcher = OverlayDispatcher
+            context = this
         )
 
         Log.d(TAG, "AgentService created")
