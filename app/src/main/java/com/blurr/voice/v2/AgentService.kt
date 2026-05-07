@@ -18,9 +18,9 @@ import com.blurr.voice.overlay.OverlayDispatcher
 import com.blurr.voice.overlay.OverlayManager
 import com.blurr.voice.v2.actions.ActionExecutor
 import com.blurr.voice.v2.fs.FileSystem
-import com.blurr.voice.v2.llm.GeminiApi
+import com.blurr.voice.v2.llm.GeminiApi as LLMGeminiApi
+import com.blurr.voice.v2.message_manager.MemoryManager
 import com.blurr.voice.v2.perception.Perception
-import com.blurr.voice.v2.perception.SemanticParser
 import kotlinx.coroutines.*
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -35,7 +35,7 @@ class AgentService : Service() {
     private lateinit var settings: AgentSettings
     private lateinit var fileSystem: FileSystem
     private lateinit var perception: Perception
-    private lateinit var llmApi: GeminiApi
+    private lateinit var llmApi: LLMGeminiApi
     private lateinit var actionExecutor: ActionExecutor
     private lateinit var overlayManager: OverlayManager
 
@@ -78,11 +78,10 @@ class AgentService : Service() {
         settings = AgentSettings()
         fileSystem = FileSystem(this)
         perception = Perception(this)
-        val apiKeyManager = com.blurr.voice.utilities.ApiKeyManager
-        llmApi = com.blurr.voice.v2.llm.GeminiApi("gemini-2.0-flash", apiKeyManager, this)
+        llmApi = LLMGeminiApi("gemini-2.0-flash", ApiKeyManager, this)
         actionExecutor = ActionExecutor(this)
         overlayManager = OverlayManager.getInstance(this)
-        val memoryManager = com.blurr.voice.v2.message_manager.MemoryManager(this)
+        val memoryManager = MemoryManager(this)
 
         agent = Agent(
             settings = settings,

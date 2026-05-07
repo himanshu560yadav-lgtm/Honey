@@ -45,7 +45,7 @@ class SettingsActivity : BaseNavigationActivity() {
     private lateinit var wakeWordButton: TextView
     private lateinit var buttonSignOut: Button
     private lateinit var wakeWordManager: WakeWordManager
-
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     private lateinit var sc: SpeechCoordinator
     private lateinit var sharedPreferences: SharedPreferences
@@ -287,7 +287,7 @@ class SettingsActivity : BaseNavigationActivity() {
     }
 
     private fun updateWakeWordButtonState() {
-        wakeWordManager.updateButtonState(wakeWordButton)
+        // Wake word disabled in this version
     }
 
     private fun showBatteryOptimizationDialog() {
