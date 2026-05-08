@@ -82,7 +82,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         btnStartStop.setOnClickListener {
-            if (AgentService.isRunning) {
+            if (ConversationalAgentService.isRunning) {
                 stopAgent()
             } else {
                 startAgent()
