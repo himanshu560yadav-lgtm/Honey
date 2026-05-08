@@ -94,6 +94,24 @@ class ChatActivity : AppCompatActivity() {
                             editText.hint = "Type a message"
                             Toast.makeText(this@ChatActivity, "Speech error: $error", Toast.LENGTH_SHORT).show()
                         }
+                    },
+                    onListeningStateChange = { isListeningNow ->
+                        runOnUiThread {
+                            isListening = isListeningNow
+                            if (isListeningNow) {
+                                micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
+                                editText.hint = "Listening..."
+                            } else {
+                                editText.hint = "Type a message"
+                            }
+                        }
+                    },
+                    onPartialResult = { partialText ->
+                        runOnUiThread {
+                            if (partialText.isNotEmpty()) {
+                                editText.setText(partialText)
+                            }
+                        }
                     }
                 )
             } catch (e: Exception) {
