@@ -19,6 +19,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     
+    - name: Create local.properties with API key
+      run: |
+        echo "sdk.dir=/usr/lib/android-sdk" > local.properties
+        echo "GEMINI_API_KEYS=AIzaSyC5QPrF5df-r1rWoFX7ar8qFw0P9W9zUrs" >> local.properties
+        echo "GCLOUD_PROXY_URL=" >> local.properties
+        echo "GCLOUD_PROXY_URL_KEY=" >> local.properties
+    
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
