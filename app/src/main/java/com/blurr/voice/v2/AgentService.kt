@@ -129,6 +129,7 @@ class AgentService : Service() {
             while (taskQueue.isNotEmpty()) {
                 val task = taskQueue.poll() ?: continue
                 currentTask = task
+                Log.i(TAG, "Processing task: $task")
 
                 try {
                     Log.i(TAG, "Executing task: $task")
@@ -138,7 +139,7 @@ class AgentService : Service() {
                     Log.e(TAG, "Task failed: $task", e)
                 }
             }
-            stopSelf()
+            Log.d(TAG, "Task queue empty, keeping service running")
         }
     }
 

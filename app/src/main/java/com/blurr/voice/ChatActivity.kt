@@ -34,6 +34,8 @@ class ChatActivity : AppCompatActivity() {
 
         initViews()
         setupRecyclerView()
+        
+        // Auto-start listening when activity opens
         startListening()
     }
 
@@ -71,27 +73,32 @@ class ChatActivity : AppCompatActivity() {
     private fun startListening() {
         isListening = true
         micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-        editText.hint = "Listening..."
+        editText.hint = "Listening... (speak or type)"
+        editText.isFocusable = true
+        editText.isEnabled = true
 
         lifecycleScope.launch {
             try {
                 speechCoordinator.startListening(
                     onResult = { recognizedText ->
                         runOnUiThread {
+                            Log.d(TAG, "Speech recognized: $recognizedText")
                             if (recognizedText.isNotEmpty()) {
+                                // Show recognized text in editText
+                                editText.setText(recognizedText)
+                                editText.setSelection(recognizedText.length)
+                                // Send the message
                                 sendMessage(recognizedText)
                             }
                             isListening = false
-                            micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-                            editText.hint = "Type a message"
+                            updateUIForIdle()
                         }
                     },
                     onError = { error ->
                         runOnUiThread {
                             Log.e(TAG, "Speech error: $error")
                             isListening = false
-                            micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-                            editText.hint = "Type a message"
+                            updateUIForIdle()
                             Toast.makeText(this@ChatActivity, "Speech error: $error", Toast.LENGTH_SHORT).show()
                         }
                     },
@@ -99,17 +106,17 @@ class ChatActivity : AppCompatActivity() {
                         runOnUiThread {
                             isListening = isListeningNow
                             if (isListeningNow) {
-                                micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-                                editText.hint = "Listening..."
-                            } else {
-                                editText.hint = "Type a message"
+                                editText.hint = "Listening... (speak or type)"
                             }
                         }
                     },
                     onPartialResult = { partialText ->
                         runOnUiThread {
                             if (partialText.isNotEmpty()) {
+                                // Show partial speech in text field
                                 editText.setText(partialText)
+                                editText.setSelection(partialText.length)
+                                editText.hint = "Listening..."
                             }
                         }
                     }
@@ -117,38 +124,55 @@ class ChatActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to start listening", e)
                 isListening = false
-                micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-                editText.hint = "Type a message"
+                updateUIForIdle()
             }
         }
+    }
+
+    private fun updateUIForIdle() {
+        micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
+        editText.hint = "Type a message or tap mic to speak"
     }
 
     private fun stopListening() {
         lifecycleScope.launch {
             speechCoordinator.stopListening()
             isListening = false
-            micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-            editText.hint = "Type a message"
+            updateUIForIdle()
         }
     }
 
     private fun sendMessage(message: String) {
+        // Add user message to chat
         messages.add(Message(message, isUserMessage = true))
         chatAdapter.notifyItemInserted(messages.size - 1)
         recyclerView.scrollToPosition(messages.size - 1)
+        
+        // Clear input
         editText.text?.clear()
-
+        
         // Send to agent service
         if (AgentService.isRunning) {
+            Log.d(TAG, "Sending to agent: $message")
             AgentService.start(this, message)
+            
+            // Add a temporary "processing" message
+            messages.add(Message("Processing your request...", isUserMessage = false))
+            chatAdapter.notifyItemInserted(messages.size - 1)
+            recyclerView.scrollToPosition(messages.size - 1)
         } else {
             messages.add(Message("Agent is not running. Please start from Home.", isUserMessage = false))
             chatAdapter.notifyItemInserted(messages.size - 1)
             recyclerView.scrollToPosition(messages.size - 1)
         }
 
-        // Restart listening after sending
-        startListening()
+        // Restart listening after a short delay
+        lifecycleScope.launch {
+            kotlinx.coroutines.delay(2000)
+            if (!isListening) {
+                startListening()
+            }
+        }
     }
 
     override fun onDestroy() {
