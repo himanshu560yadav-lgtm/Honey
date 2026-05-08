@@ -76,7 +76,6 @@ class AgentService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        isRunning = true
 
         eyes = Eyes(this)
         finger = Finger(this)
@@ -116,6 +115,7 @@ class AgentService : Service() {
 
             val task = it.getStringExtra(EXTRA_TASK)
             if (!task.isNullOrEmpty()) {
+                isRunning = true
                 taskQueue.add(task)
                 startForeground(NOTIFICATION_ID, createNotification("Agent is running"))
                 processTasks()

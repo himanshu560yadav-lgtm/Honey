@@ -25,7 +25,6 @@ import com.blurr.voice.utilities.WakeWordManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.coroutines.cancellation.CancellationException
 
 class SettingsActivity : BaseNavigationActivity() {
 
@@ -37,6 +36,7 @@ class SettingsActivity : BaseNavigationActivity() {
     private lateinit var editUserName: android.widget.EditText
     private lateinit var editUserEmail: android.widget.EditText
     private lateinit var editWakeWordKey: android.widget.EditText
+    private lateinit var editGeminiApiKey: android.widget.EditText
     private lateinit var textGetPicovoiceKeyLink: TextView
     private lateinit var wakeWordButton: TextView
     private lateinit var buttonSignOut: Button
@@ -54,6 +54,7 @@ class SettingsActivity : BaseNavigationActivity() {
         private const val TEST_TEXT = "Hello, I am Honey, your personal AI assistant."
         private val DEFAULT_VOICE = TTSVoice.CHIRP_PUCK
         const val KEY_SHOW_THOUGHTS = "show_thoughts"
+        const val KEY_GEMINI_API_KEY = "gemini_api_key_runtime"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,6 +102,7 @@ class SettingsActivity : BaseNavigationActivity() {
         editUserName = findViewById(R.id.editUserName)
         editUserEmail = findViewById(R.id.editUserEmail)
         textGetPicovoiceKeyLink = findViewById(R.id.textGetPicovoiceKeyLink)
+        editGeminiApiKey = findViewById(R.id.editGeminiApiKey)
 
         setupClickListeners()
         setupVoicePicker()
@@ -146,6 +148,18 @@ class SettingsActivity : BaseNavigationActivity() {
             showSignOutConfirmationDialog()
         }
 
+        findViewById<TextView>(R.id.buttonSaveGeminiKey).setOnClickListener {
+            val key = editGeminiApiKey.text.toString().trim()
+            if (key.isBlank()) {
+                Toast.makeText(this, "Please enter a valid API key", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            sharedPreferences.edit().putString(KEY_GEMINI_API_KEY, key).apply()
+            com.blurr.voice.utilities.ApiKeyManager.setKeys(listOf(key))
+            Toast.makeText(this, "Gemini API key saved!", Toast.LENGTH_SHORT).show()
+            Log.d("SettingsActivity", "Runtime Gemini key saved")
+        }
+
         findViewById<TextView>(R.id.viewTaskLogsButton).setOnClickListener {
             startActivity(Intent(this, TaskLogsListActivity::class.java))
         }
@@ -183,6 +197,13 @@ class SettingsActivity : BaseNavigationActivity() {
 
     private fun loadAllSettings() {
         editWakeWordKey.setText("")
+
+        // Load saved runtime Gemini key
+        val savedGeminiKey = sharedPreferences.getString(KEY_GEMINI_API_KEY, "")
+        if (!savedGeminiKey.isNullOrBlank()) {
+            editGeminiApiKey.setText(savedGeminiKey)
+            com.blurr.voice.utilities.ApiKeyManager.setKeys(listOf(savedGeminiKey))
+        }
 
         val savedVoiceName = sharedPreferences.getString(KEY_SELECTED_VOICE, DEFAULT_VOICE.name)
         val savedVoice = availableVoices.find { it.name == savedVoiceName } ?: DEFAULT_VOICE
