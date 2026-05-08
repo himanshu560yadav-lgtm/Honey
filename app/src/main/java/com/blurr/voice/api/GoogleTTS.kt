@@ -49,95 +49,23 @@ enum class TTSVoice(val displayName: String, val voiceName: String, val descript
     CHIRP_ZEPHYR("Zephyr", "en-US-Chirp3-HD-Zephyr", "High-definition female voice."),
     CHIRP_ZUBENELGENUBI("Zubenelgenubi", "en-US-Chirp3-HD-Zubenelgenubi", "High-definition male voice.")
 }
+
 /**
- * Handles communication with the Google Cloud Text-to-Speech API.
+ * Google TTS is DISABLED — no API key configured.
+ * All calls throw an exception so TTSManager falls back to Android native TTS.
  */
 object GoogleTts {
-    private val apiKey: String = "" // Google TTS disabled
-    private val client = OkHttpClient()
+    private const val TAG = "GoogleTts"
 
+    // Google TTS disabled — no API key
     fun isEnabled(): Boolean = false
 
-    private const val API_URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize"
-
-    /**
-     * Synthesizes speech from text using the Google Cloud TTS API with default voice.
-     * @param text The text to synthesize.
-     * @return A ByteArray containing the raw audio data (LINEAR16 PCM).
-     * @throws Exception if the API call fails or the response is invalid.
-     */
-    suspend fun synthesize(text: String): ByteArray = synthesize(text, TTSVoice.CHIRP_LAOMEDEIA)
-    /**
-     * Synthesizes speech from text using the Google Cloud TTS API.
-     * @param text The text to synthesize.
-     * @param voice The voice to use for synthesis.
-     * @return A ByteArray containing the raw audio data (LINEAR16 PCM).
-     * @throws Exception if the API call fails or the response is invalid.
-     */
-    suspend fun synthesize(text: String, voice: TTSVoice): ByteArray = withContext(Dispatchers.IO) {
-        if (apiKey.isEmpty()) {
-            throw Exception("Google TTS API key is not configured.")
-        }
-        println(voice.displayName)
-
-        // Network check
-        val isOnline = try {
-            true
-        } catch (e: Exception) {
-            Log.e("GoogleTts", "Network check failed, assuming offline. ${'$'}{e.message}")
-            false
-        }
-        if (!isOnline) {
-            NetworkNotifier.notifyOffline()
-            throw Exception("No internet connection for TTS request.")
-        }
-
-        // 1. Construct the JSON payload
-        val jsonPayload = JSONObject().apply {
-            put("input", JSONObject().put("text", text))
-            put("voice", JSONObject().apply {
-                put("languageCode", "en-US")
-                put("name", voice.voiceName)
-            })
-            put("audioConfig", JSONObject().apply {
-                put("audioEncoding", "LINEAR16")
-                put("sampleRateHertz", 24000)
-            })
-        }.toString()
-
-        // 2. Build the network request
-        val request = Request.Builder()
-            .url(API_URL)
-            .header("X-Goog-Api-Key", apiKey)
-            .header("Content-Type", "application/json; charset=utf-8")
-            .header("X-Android-Package", BuildConfig.APPLICATION_ID)
-//            .header("X-Android-Cert", BuildConfig.SHA1_FINGERPRINT)
-            .post(jsonPayload.toRequestBody("application/json".toMediaType()))
-            .build()
-
-        // 3. Execute the request and handle the response
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                val errorBody = response.body?.string()
-                Log.e("GoogleTts", "API Error: ${response.code} - $errorBody")
-                throw Exception("Google TTS API request failed with code ${response.code}")
-            }
-
-            val responseBody = response.body?.string()
-            if (responseBody.isNullOrEmpty()) {
-                throw Exception("Received an empty response from Google TTS API.")
-            }
-
-            // 4. Decode the Base64 audio content into a ByteArray
-            val jsonResponse = JSONObject(responseBody)
-            val audioContent = jsonResponse.getString("audioContent")
-            return@withContext Base64.decode(audioContent, Base64.DEFAULT)
-        }
-    }
-
-    /**
-     * Get all available voice options
-     * @return List of all available TTS voices
-     */
     fun getAvailableVoices(): List<TTSVoice> = TTSVoice.values().toList()
+
+    suspend fun synthesize(text: String): ByteArray = synthesize(text, TTSVoice.CHIRP_LAOMEDEIA)
+
+    suspend fun synthesize(text: String, voice: TTSVoice): ByteArray {
+        // Throw so TTSManager catch block uses native Android TTS
+        throw Exception("Google TTS is disabled. No API key configured. Using native TTS.")
+    }
 }
