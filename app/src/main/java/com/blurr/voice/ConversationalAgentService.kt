@@ -469,8 +469,12 @@ class ConversationalAgentService : Service() {
                 }
                 pandaStateManager.setState(PandaState.PROCESSING)
                 visualFeedbackManager.showThinkingIndicator()
-                val defaultJsonResponse = """{"Type": "Reply", "Reply": "I'm sorry, I had an issue.", "Instruction": "", "Should End": "Continue"}"""
+                
+                Log.d("ConvAgent", "Calling Gemini API...")
+                val defaultJsonResponse = """{"Type": "Reply", "Reply": "Hello! I am working. Say something to me!", "Instruction": "", "Should End": "Continue"}"""
                 val rawModelResponse = getReasoningModelApiResponse(conversationHistory) ?: defaultJsonResponse
+                
+                Log.d("ConvAgent", "API Response: $rawModelResponse")
                 visualFeedbackManager.hideThinkingIndicator()
                 val decision = parseModelResponse(rawModelResponse)
                 Log.d("TTS_DEBUG", "Reply received from GeminiApi: -->${rawModelResponse}<--")
