@@ -17,6 +17,14 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
+        <ImageButton
+            android:id="@+id/micButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:contentDescription="Speak"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
         <EditText
             android:id="@+id/editText"
             android:layout_width="0dp"

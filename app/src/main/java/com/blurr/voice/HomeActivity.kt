@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import com.blurr.voice.utilities.ApiKeyManager
 import com.blurr.voice.utilities.PermissionManager
 import com.blurr.voice.v2.AgentService
+import com.blurr.voice.ChatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
@@ -206,6 +207,10 @@ class HomeActivity : AppCompatActivity() {
         } else {
             startService(intent)
         }
+
+        // Launch ChatActivity so user can type or speak commands
+        val chatIntent = Intent(this, ChatActivity::class.java)
+        startActivity(chatIntent)
 
         Toast.makeText(this, "Starting Honey...", Toast.LENGTH_SHORT).show()
         checkServiceStatus()

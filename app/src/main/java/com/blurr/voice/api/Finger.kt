@@ -33,7 +33,7 @@ class Finger(private val context: Context) {
         try {
             val intent = Intent().apply {
                 // Use the app's own context to find the activity class
-                setClassName(context, "com.blurr.app.ChatActivity")
+                setClassName(context, "com.blurr.voice.ChatActivity")
                 putExtra("custom_message", message)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
