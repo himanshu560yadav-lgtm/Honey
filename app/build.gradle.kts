@@ -104,6 +104,9 @@ dependencies {
     implementation("androidx.test.uiautomator:uiautomator:2.3.0")
 
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 }
 
 tasks.register("incrementVersion") {
