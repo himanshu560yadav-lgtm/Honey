@@ -19,8 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.blurr.voice.utilities.ApiKeyManager
 import com.blurr.voice.utilities.PermissionManager
-import com.blurr.voice.v2.AgentService
-import com.blurr.voice.ChatActivity
+import com.blurr.voice.ConversationalAgentService
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
@@ -172,7 +171,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun checkServiceStatus() {
-        if (AgentService.isRunning) {
+        if (ConversationalAgentService.isRunning) {
             tvStatus.text = "Running"
             tvStatus.setTextColor(ContextCompat.getColor(this, R.color.green))
             btnStartStop.text = "Stop Honey"
@@ -200,24 +199,20 @@ class HomeActivity : AppCompatActivity() {
             return
         }
 
-        // Start the agent service
-        val intent = Intent(this, AgentService::class.java)
+        // Start the ConversationalAgentService - this handles voice chat and can trigger AgentService for tasks
+        val intent = Intent(this, ConversationalAgentService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent)
         } else {
             startService(intent)
         }
 
-        // Launch ChatActivity so user can type or speak commands
-        val chatIntent = Intent(this, ChatActivity::class.java)
-        startActivity(chatIntent)
-
         Toast.makeText(this, "Starting Honey...", Toast.LENGTH_SHORT).show()
         checkServiceStatus()
     }
 
     private fun stopAgent() {
-        val intent = Intent(this, AgentService::class.java)
+        val intent = Intent(this, ConversationalAgentService::class.java)
         stopService(intent)
         Toast.makeText(this, "Stopping Honey...", Toast.LENGTH_SHORT).show()
         checkServiceStatus()
