@@ -1,0 +1,20 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/Honey aii/Honey/build.gradle",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 342,
+          "line": 10
+        },
+        "start": {
+          "column": 0,
+          "index": 0,
+          "line": 0
+        }
+      }
+    }
+  ],
+  "selectedFile": "/storage/emulated/0/Honey aii/Honey/build.gradle"
+}

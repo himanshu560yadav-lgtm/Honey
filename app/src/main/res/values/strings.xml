@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Honey</string>
+    <string name="accessibility_service_description">Honey AI agent ko screen padhne aur actions karne ki permission deta hai</string>
+</resources>
